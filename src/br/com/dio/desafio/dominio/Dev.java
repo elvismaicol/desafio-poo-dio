@@ -2,19 +2,37 @@ package br.com.dio.desafio.dominio;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class Dev {
 
 	private String nome;
-	private Set<Conteudo> conteudoInscritos = new LinkedHashSet<>();
-	private Set<Conteudo> conteudoConcluidos = new LinkedHashSet<>();
+	private Set<Conteudo> conteudosInscritos = new LinkedHashSet<>();
+	private Set<Conteudo> conteudosConcluidos = new LinkedHashSet<>();
 	
-	public void inscreverBootcamp(Bootcamp bootcamp) {}
+	public void inscreverBootcamp(Bootcamp bootcamp) {
+		this.conteudosInscritos.addAll(bootcamp.getConteudos());
+		bootcamp.getDevsInscritos().add(this);
+	}
 	
-	public void prodredir() {}
+	public void prodredir() {
+		Optional<Conteudo> conteudo = conteudosInscritos.stream().findFirst();
+		if(conteudo.isPresent()) {
+			this.conteudosConcluidos.add(conteudo.get());
+			this.conteudosInscritos.remove(conteudo.get());
+		}
+		else {
+			System.err.println("Você não esta matriculado em nenhum conteúdo");
+		}
+	}
 	
-	public void calcularTotalXp() {}
+	public double calcularTotalXp() {
+		return this.conteudosConcluidos
+		.stream()
+		.mapToDouble(Conteudo::calcularXp)
+		.sum();
+	}
 
 	public String getNome() {
 		return nome;
@@ -24,25 +42,25 @@ public class Dev {
 		this.nome = nome;
 	}
 
-	public Set<Conteudo> getConteudoInscritos() {
-		return conteudoInscritos;
+	public Set<Conteudo> getConteudosInscritos() {
+		return conteudosInscritos;
 	}
 
-	public void setConteudoInscritos(Set<Conteudo> conteudoInscritos) {
-		this.conteudoInscritos = conteudoInscritos;
+	public void setConteudosInscritos(Set<Conteudo> conteudosInscritos) {
+		this.conteudosInscritos = conteudosInscritos;
 	}
 
-	public Set<Conteudo> getConteudoConcluidos() {
-		return conteudoConcluidos;
+	public Set<Conteudo> getConteudosConcluidos() {
+		return conteudosConcluidos;
 	}
 
-	public void setConteudoConcluidos(Set<Conteudo> conteudoConcluidos) {
-		this.conteudoConcluidos = conteudoConcluidos;
+	public void setConteudosConcluidos(Set<Conteudo> conteudosConcluidos) {
+		this.conteudosConcluidos = conteudosConcluidos;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(conteudoConcluidos, conteudoInscritos, nome);
+		return Objects.hash(conteudosConcluidos, conteudosInscritos, nome);
 	}
 
 	@Override
@@ -54,7 +72,7 @@ public class Dev {
 		if (getClass() != obj.getClass())
 			return false;
 		Dev other = (Dev) obj;
-		return Objects.equals(conteudoConcluidos, other.conteudoConcluidos)
-				&& Objects.equals(conteudoInscritos, other.conteudoInscritos) && Objects.equals(nome, other.nome);
+		return Objects.equals(conteudosConcluidos, other.conteudosConcluidos)
+				&& Objects.equals(conteudosInscritos, other.conteudosInscritos) && Objects.equals(nome, other.nome);
 	}
 }
